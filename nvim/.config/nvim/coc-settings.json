@@ -1,0 +1,12 @@
+{
+    "eslint.format.enable": true,
+    "typescript.suggest.enabled": true,
+    "typescript.validate.enable": true,
+    "typescript.suggestionActions.enabled": true,
+    "diagnostic.errorSign": "×",
+    "diagnostic.warningSign": "⚠",
+    "diagnostic.infoSign": "ℹ",
+    "diagnostic.hintSign": "•",
+    "clangd.path": "~/.config/coc/extensions/coc-clangd-data/install/15.0.3/clangd_15.0.3/bin/clangd",
+    "rust-analyzer.serverPath": "/usr/bin/rust-analyzer"
+}
