@@ -1,0 +1,214 @@
+;   ██████╗  ██████╗ ██╗  ██╗   ██╗██████╗  █████╗ ██████╗
+;   ██╔══██╗██╔═══██╗██║  ╚██╗ ██╔╝██╔══██╗██╔══██╗██╔══██╗
+;   ██████╔╝██║   ██║██║   ╚████╔╝ ██████╔╝███████║██████╔╝
+;   ██╔═══╝ ██║   ██║██║    ╚██╔╝  ██╔══██╗██╔══██║██╔══██╗
+;   ██║     ╚██████╔╝███████╗██║   ██████╔╝██║  ██║██║  ██║
+;   ╚═╝      ╚═════╝ ╚══════╝╚═╝   ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
+;           https://github.com/polybar/polybar
+
+[colors]
+background = #222
+background-alt = #444
+foreground = #dfdfdf
+foreground-alt = #555
+primary = #ff4151
+secondary = #787878
+alert = #bd2c40
+
+[bar/top]
+monitor = ${env:MONITOR:DP-3}
+width = 100%
+height = 24
+fixed-center = true
+background = ${colors.background}
+foreground = ${colors.foreground}
+line-size = 1
+line-color = ${colors.primary}
+padding-left = 0
+padding-right = 0
+border-bottom-size = 1
+border-bottom-color = ${colors.foreground-alt}
+module-margin-left = 0
+module-margin-right = 0
+font-0 = Hack:size=10;2
+font-1 = Noto Color Emoji:style=Regular:scale=12;2
+modules-left = i3
+modules-center = date
+modules-right = pulseaudio memory cpu temperature gpuutil gputemp gpu2util gpu2temp
+; gpumine gpuutil gputemp gpumh gpu2mine gpu2util gpu2temp gpu2mh
+; modules-right = audiodevice pulseaudio memory cpu temperature gpumine gpuutil gputemp gpumh gpu2mine gpu2util gpu2temp gpu2mh
+cursor-click = pointer
+cursor-scroll = ns-resize
+
+[module/i3]
+type = internal/i3
+format = <label-state> <label-mode>
+index-sort = true
+pin-workspaces = false
+wrapping-scroll = false
+label-mode-padding = 2
+label-mode-foreground = #000
+label-mode-background = ${colors.primary}
+; focused = Active workspace on focused monitor
+label-focused = %index%
+label-focused-background = ${colors.secondary}
+label-focused-underline= ${colors.primary}
+label-focused-padding = 2
+; unfocused = Inactive workspace on any monitor
+label-unfocused = %index%
+label-unfocused-padding = 2
+; visible = Active workspace on unfocused monitor
+label-visible = %index%
+label-visible-background = ${colors.background-alt}
+label-visible-underline = ${colors.primary}
+label-visible-padding = 2
+; urgent = Workspace with urgency hint set
+label-urgent = %index%
+label-urgent-background = ${colors.alert}
+label-urgent-padding = 2
+
+[module/date]
+type = internal/date
+interval = 1
+date = "%Y/%m/%d"
+time = %H:%M:%S
+label = %date% %time%
+
+[module/audiodevice]
+type = custom/script
+exec = audioswitch
+interval = 1
+click-left = audioswitch toggle
+format = <label>
+format-padding = 1
+format-background = ${colors.background}
+format-foreground = ${colors.foreground}
+label = %output%
+label-font = 1
+
+[module/pulseaudio]
+type = internal/pulseaudio
+format-volume = <label-volume> <bar-volume>
+label-volume = %percentage%%
+label-volume-foreground = ${root.foreground}
+; sink = alsa_output.pci-0000_0f_00.4.iec958-stereo
+label-muted = 🔇
+label-muted-foreground = ${colors.foreground-alt}
+bar-volume-width = 10
+bar-volume-foreground-0 = ${colors.primary}
+bar-volume-gradient = false
+bar-volume-indicator = |
+bar-volume-indicator-font = 2
+bar-volume-fill = ─
+bar-volume-fill-font = 2
+bar-volume-empty = ─
+bar-volume-empty-font = 2
+bar-volume-empty-foreground = ${colors.foreground-alt}
+use-ui-max = false
+
+[module/memory]
+type = internal/memory
+interval = 1
+format-padding = 2
+format = <label>
+label = [MEM] %percentage_used%%
+
+[module/cpu]
+type = internal/cpu
+interval = 1
+format-padding = 0
+format = <label>
+label = [CPU] %percentage:0%%
+
+[module/temperature]
+type = internal/temperature
+interval = 1
+format-padding = 1
+format = <label>
+label = %temperature-c%
+
+[module/gpumine]
+type = custom/script
+exec = minerutil miner0
+interval = 1
+click-left = minerutil miner0 toggle
+format = <label>
+format-padding = 1
+format-background = ${colors.background}
+format-foreground = ${colors.foreground}
+label = %output%
+label-font = 1
+
+[module/gpuutil]
+type = custom/script
+interval = 1
+format = <label>
+label = [GPU1] %output%
+exec = nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits | awk 'NR==1{print $1 "% "}'
+
+[module/gputemp]
+type = custom/script
+interval = 1
+format = <label>
+label = %output%
+exec = nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits | awk 'NR==1{print $1 "°C "}'
+
+[module/gpumh]
+type = custom/script
+interval = 1
+format = <label>
+label = %output%
+label-padding-right = 1
+exec = minerstats miner0
+exec-if = minerstats miner0
+
+[module/gpu2mine]
+type = custom/script
+exec = minerutil miner1
+interval = 1
+click-left = minerutil miner1 toggle
+format = <label>
+format-padding = 1
+format-background = ${colors.background}
+format-foreground = ${colors.foreground}
+label = %output%
+label-font = 1
+
+[module/gpu2util]
+type = custom/script
+interval = 1
+format = <label>
+label = [GPU2] %output%
+exec = nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits | awk 'NR==2{print $1 "% "}'
+
+[module/gpu2temp]
+type = custom/script
+interval = 1
+format = <label>
+label = %output%
+exec = nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits | awk 'NR==2{print $1 "°C "}'
+
+[module/gpu2mh]
+type = custom/script
+interval = 1
+format = <label>
+label = %output%
+label-padding-right = 1
+exec = minerstats miner1
+exec-if = minerstats miner1
+
+[module/wattage]
+type = custom/script
+exec = ~/.bin/ups_wattage.sh
+label = " %output%W"
+interval = 15
+format-padding = 1
+
+[settings]
+screenchange-reload = true
+
+[global/wm]
+margin-top = 5
+margin-bottom = 5
+
+; vim:ft=dosini
