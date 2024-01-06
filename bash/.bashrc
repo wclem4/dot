@@ -5,12 +5,8 @@
 alias ls='ls -l --color=auto'
 alias vim='nvim'
 alias feh='feh -Z'
-alias awslogin='eval $(aws ecr --profile default get-login --no-include-email)'
-alias vpn='sudo openvpn --config /home/walker/vpn/profile-526.ovpn --auth-user-pass /home/walker/vpn/vpncreds'
+# alias vpn='sudo openvpn --config /home/walker/vpn/profile-526.ovpn --auth-user-pass /home/walker/vpn/vpncreds'
 alias showpath="tr ':' '\n' <<< "$PATH""
-# alias medcop="cd /home/walker/go/src/github.com/Novetta/medcop"
-# alias kernos="cd /home/walker/code/personal/kernos"
-# alias skynet="cd /home/walker/code/personal/kernos/apps/skynet"
 alias bc='bc -q'
 alias sudo='sudo '
 
