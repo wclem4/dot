@@ -46,6 +46,8 @@ require("lazy").setup({
     },
   },
 
+  "nvim-treesitter/nvim-treesitter",
+
   -- Search
   { 'nvim-telescope/telescope.nvim', tag = '0.1.5',
     dependencies = { 'nvim-lua/plenary.nvim',  }
@@ -54,8 +56,6 @@ require("lazy").setup({
 
   -- Key dictionary popup 
   'folke/which-key.nvim',
-
-  'nvim-treesitter/nvim-treesitter',
 
   -- LSP
   'neovim/nvim-lspconfig',
@@ -75,6 +75,13 @@ require("lazy").setup({
   },
 })
 
+require("nvim-treesitter.configs").setup {
+  ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "javascript", "typescript", "tsx", "sql", "go" },
+  highlight = {
+    enable = true
+  }
+}
+
 require("which-key").setup()
 
 -- reopen file at last position
@@ -84,6 +91,12 @@ vim.api.nvim_create_autocmd('BufReadPost', {
         if vim.fn.line("'\"") > 1 and vim.fn.line("'\"") <= vim.fn.line("$") then
             vim.cmd([[normal! g`"]])
         end
+    end
+})
+
+vim.api.nvim_create_autocmd('BufWritePost', {
+    callback = function()
+        vim.lsp.buf.format()
     end
 })
 
@@ -161,7 +174,7 @@ sign({name = 'DiagnosticSignHint', text = '⚑'})
 sign({name = 'DiagnosticSignInfo', text = ''})
 
 vim.diagnostic.config({
-  virtual_text = false,
+  virtual_text = true,
   severity_sort = true,
   float = {
     border = 'rounded',
@@ -187,7 +200,7 @@ require("mason-lspconfig").setup({
         "bashls",
         "jsonls",
         "gopls",
-        "sqls",
+        "sqlls",
         "tsserver",
         "lua_ls",
     },
@@ -207,7 +220,7 @@ lspconfig.jsonls.setup({
 lspconfig.gopls.setup({
   capabilities = lsp_capabilities,
 })
-lspconfig.sqls.setup({
+lspconfig.sqlls.setup({
   capabilities = lsp_capabilities,
 })
 lspconfig.tsserver.setup({
