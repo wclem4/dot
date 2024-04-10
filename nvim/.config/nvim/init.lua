@@ -5,10 +5,10 @@ vim.o.tabstop = 4
 vim.o.expandtab = true
 vim.o.shiftwidth = 2
 
-vim.o.number = true -- show numbers 
+vim.o.number = true      -- show numbers
 vim.o.signcolumn = "yes" -- always show the sign column left of numbers
-vim.o.ignorecase = true -- ignore case when searching
-vim.o.scrolloff = 1 -- number of lines kept above/below cursor
+vim.o.ignorecase = true  -- ignore case when searching
+vim.o.scrolloff = 1      -- number of lines kept above/below cursor
 vim.o.termguicolors = true
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -26,8 +26,9 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
   -- Theme
-  { "ellisonleao/gruvbox.nvim",
-    priority = 1000 ,
+  {
+    "ellisonleao/gruvbox.nvim",
+    priority = 1000,
     config = function()
       vim.cmd.colorscheme 'gruvbox'
     end,
@@ -35,7 +36,8 @@ require("lazy").setup({
   },
 
   -- Fancy status line
-  { 'nvim-lualine/lualine.nvim',
+  {
+    'nvim-lualine/lualine.nvim',
     opts = {
       options = {
         icons_enabled = false,
@@ -49,12 +51,14 @@ require("lazy").setup({
   "nvim-treesitter/nvim-treesitter",
 
   -- Search
-  { 'nvim-telescope/telescope.nvim', tag = '0.1.5',
-    dependencies = { 'nvim-lua/plenary.nvim',  }
+  {
+    'nvim-telescope/telescope.nvim',
+    tag = '0.1.5',
+    dependencies = { 'nvim-lua/plenary.nvim', }
   },
   'benfowler/telescope-luasnip.nvim',
 
-  -- Key dictionary popup 
+  -- Key dictionary popup
   'folke/which-key.nvim',
 
   -- LSP
@@ -70,8 +74,23 @@ require("lazy").setup({
   'saadparwaiz1/cmp_luasnip',
 
   -- Snippets
-  { 'L3MON4D3/LuaSnip',
+  {
+    'L3MON4D3/LuaSnip',
     dependencies = { 'rafamadriz/friendly-snippets', }
+  },
+  {
+    'stevearc/conform.nvim',
+    opts = {},
+  },
+})
+
+require("conform").setup({
+  formatters_by_ft = {
+    javascript = { "prettier" },
+    typescript = { "prettier" }
+  },
+  format_on_save = {
+    async = true,
   },
 })
 
@@ -86,19 +105,20 @@ require("which-key").setup()
 
 -- reopen file at last position
 vim.api.nvim_create_autocmd('BufReadPost', {
-    pattern = '*',
-    callback = function()
-        if vim.fn.line("'\"") > 1 and vim.fn.line("'\"") <= vim.fn.line("$") then
-            vim.cmd([[normal! g`"]])
-        end
+  pattern = '*',
+  callback = function()
+    if vim.fn.line("'\"") > 1 and vim.fn.line("'\"") <= vim.fn.line("$") then
+      vim.cmd([[normal! g`"]])
     end
+  end
 })
 
-vim.api.nvim_create_autocmd('BufWritePost', {
-    callback = function()
-        vim.lsp.buf.format()
-    end
-})
+
+-- vim.api.nvim_create_autocmd('BufWritePost', {
+--   callback = function()
+--     vim.lsp.buf.format()
+--   end
+-- })
 
 -- copy paste between windows
 vim.keymap.set('v', '<leader>y', ':w! /tmp/vitmp<CR>', { noremap = true, silent = true })
@@ -117,7 +137,7 @@ vim.keymap.set('n', '<leader>sf', tsb.find_files, { desc = '[S]earch [F]iles' })
 vim.keymap.set('n', '<leader>sg', tsb.live_grep, { desc = '[S]earch by [G]rep' })
 vim.keymap.set('n', '<leader>sw', tsb.grep_string, { desc = '[S]earch current [W]ord' })
 
--- search diagnostics 
+-- search diagnostics
 vim.keymap.set('n', '<leader>sd', tsb.diagnostics, { desc = '[S]earch [D]iagnostics' })
 
 -- resume previous search
@@ -137,7 +157,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
   desc = 'LSP actions',
   callback = function()
     local bufmap = function(mode, lhs, rhs)
-      local opts = {buffer = true}
+      local opts = { buffer = true }
       vim.keymap.set(mode, lhs, rhs, opts)
     end
 
@@ -168,10 +188,10 @@ local sign = function(opts)
   })
 end
 
-sign({name = 'DiagnosticSignError', text = '✘'})
-sign({name = 'DiagnosticSignWarn', text = '▲'})
-sign({name = 'DiagnosticSignHint', text = '⚑'})
-sign({name = 'DiagnosticSignInfo', text = ''})
+sign({ name = 'DiagnosticSignError', text = '✘' })
+sign({ name = 'DiagnosticSignWarn', text = '▲' })
+sign({ name = 'DiagnosticSignHint', text = '⚑' })
+sign({ name = 'DiagnosticSignInfo', text = '' })
 
 vim.diagnostic.config({
   virtual_text = true,
@@ -184,27 +204,28 @@ vim.diagnostic.config({
 
 vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(
   vim.lsp.handlers.hover,
-  {border = 'rounded'}
+  { border = 'rounded' }
 )
 
 vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(
   vim.lsp.handlers.signature_help,
-  {border = 'rounded'}
+  { border = 'rounded' }
 )
 
 -- Mason Setup
 require("mason").setup()
 
 require("mason-lspconfig").setup({
-    ensure_installed = {
-        "bashls",
-        "jsonls",
-        "gopls",
-        "sqlls",
-        "tsserver",
-        "lua_ls",
-    },
-    automatic_installation = true,
+  ensure_installed = {
+    "bashls",
+    "jsonls",
+    "gopls",
+    "sqlls",
+    "tsserver",
+    "lua_ls",
+    "eslint",
+  },
+  automatic_installation = true,
 })
 
 -- LSP config
@@ -229,14 +250,17 @@ lspconfig.tsserver.setup({
 lspconfig.lua_ls.setup({
   capabilities = lsp_capabilities,
 })
+lspconfig.eslint.setup({
+  capabilities = lsp_capabilities,
+})
 
 -- Autocomplete
-vim.opt.completeopt = {'menu', 'menuone'}
+vim.opt.completeopt = { 'menu', 'menuone' }
 require('luasnip.loaders.from_vscode').lazy_load()
 
 local cmp = require('cmp')
 local luasnip = require('luasnip')
-local select_opts = {behavior = cmp.SelectBehavior.Select}
+local select_opts = { behavior = cmp.SelectBehavior.Select }
 
 cmp.setup({
   snippet = {
@@ -245,16 +269,16 @@ cmp.setup({
     end
   },
   sources = {
-    {name = 'path'},
-    {name = 'luasnip'},
-    {name = 'nvim_lsp'},
-    {name = 'buffer', keyword_length = 2},
+    { name = 'path' },
+    { name = 'luasnip' },
+    { name = 'nvim_lsp' },
+    { name = 'buffer',  keyword_length = 2 },
   },
   window = {
     documentation = cmp.config.window.bordered()
   },
   formatting = {
-    fields = {'menu', 'abbr', 'kind'},
+    fields = { 'menu', 'abbr', 'kind' },
     format = function(entry, item)
       local menu_icon = {
         nvim_lsp = 'lsp',
@@ -277,7 +301,7 @@ cmp.setup({
     ['<C-d>'] = cmp.mapping.scroll_docs(4),
 
     ['<C-e>'] = cmp.mapping.abort(),
-    ['<CR>'] = cmp.mapping.confirm({select = false}),
+    ['<CR>'] = cmp.mapping.confirm({ select = false }),
 
     ['<C-f>'] = cmp.mapping(function(fallback)
       if luasnip.jumpable(1) then
@@ -285,7 +309,7 @@ cmp.setup({
       else
         fallback()
       end
-    end, {'i', 's'}),
+    end, { 'i', 's' }),
 
     ['<C-b>'] = cmp.mapping(function(fallback)
       if luasnip.jumpable(-1) then
@@ -293,7 +317,7 @@ cmp.setup({
       else
         fallback()
       end
-    end, {'i', 's'}),
+    end, { 'i', 's' }),
 
     ['<Tab>'] = cmp.mapping(function(fallback)
       local col = vim.fn.col('.') - 1
@@ -305,7 +329,7 @@ cmp.setup({
       else
         cmp.complete()
       end
-    end, {'i', 's'}),
+    end, { 'i', 's' }),
 
     ['<S-Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
@@ -313,6 +337,6 @@ cmp.setup({
       else
         fallback()
       end
-    end, {'i', 's'}),
+    end, { 'i', 's' }),
   },
 })
