@@ -18,6 +18,7 @@ PATH=~/.bin:$PATH
 PATH=~/.local/share/gem/ruby/3.0.0/bin:$PATH
 
 GEM_HOME=~/.gem
+HISTSIZE=20000
 
 # bash prompt
 PS1='\[\e[41m\]\[\e[1;37m\] \u \[\e[47m\]\[\e[1;30m\] \w \[\e[0m\]\[\e[1;37m\]\[\e[41m\] > \[\e[0m\] '
