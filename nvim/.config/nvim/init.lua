@@ -24,27 +24,27 @@ vim.api.nvim_create_autocmd('BufReadPost', {
 vim.keymap.set('v', '<leader>y', ':w! /tmp/vitmp<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<leader>p', ':r! cat /tmp/vitmp<CR>', { noremap = true, silent = true })
 
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
-    "git",
-    "clone",
-    "--filter=blob:none",
-    "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable",
+    'git',
+    'clone',
+    '--filter=blob:none',
+    'https://github.com/folke/lazy.nvim.git',
+    '--branch=stable',
     lazypath,
   })
 end
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup({
+require('lazy').setup({
 
   -- Color Scheme
   {
-    "rebelot/kanagawa.nvim",
+    'rebelot/kanagawa.nvim',
     priority = 1000,
     config = function()
-      vim.cmd.colorscheme "kanagawa"
+      vim.cmd.colorscheme 'kanagawa'
     end,
   },
 
@@ -61,10 +61,10 @@ require("lazy").setup({
   'stevearc/conform.nvim',
 
   -- Parser
-  "nvim-treesitter/nvim-treesitter",
+  'nvim-treesitter/nvim-treesitter',
 
   -- Notifications
-  "j-hui/fidget.nvim",
+  'j-hui/fidget.nvim',
 
   -- Search
   {
@@ -109,11 +109,11 @@ require('lualine').setup {
 }
 
 -- Formatter Setup
-require("conform").setup({
+require('conform').setup({
   formatters_by_ft = {
-    javascript = { "prettier" },
-    typescript = { "prettier" },
-    go = { "goimports", "gofmt" }
+    javascript = { 'prettier' },
+    typescript = { 'prettier' },
+    go = { 'goimports', 'gofmt' }
   },
   format_on_save = {
     lsp_fallback = true,
@@ -121,20 +121,20 @@ require("conform").setup({
 })
 
 -- Parser Setup
-require("nvim-treesitter.configs").setup {
+require('nvim-treesitter.configs').setup {
   ensure_installed = {
-    "javascript",
-    "typescript",
-    "tsx",
-    "sql",
-    "go",
-    "gomod",
-    "gosum",
-    "lua",
-    "vim",
-    "vimdoc",
-    "query",
-    "c",
+    'javascript',
+    'typescript',
+    'tsx',
+    'sql',
+    'go',
+    'gomod',
+    'gosum',
+    'lua',
+    'vim',
+    'vimdoc',
+    'query',
+    'c',
   },
   highlight = {
     enable = true,
@@ -142,7 +142,7 @@ require("nvim-treesitter.configs").setup {
 }
 
 -- Notifications Setup
-require("fidget").setup()
+require('fidget').setup()
 
 -- Search Setup
 require('telescope').setup()
@@ -160,15 +160,15 @@ vim.keymap.set('n', '<leader>ss', tsb.builtin, { desc = '[S]earch [S]elect Teles
 require('which-key').setup()
 
 -- Package Manager Setup
-require("mason").setup({
+require('mason').setup({
   ui = {
     width = 0.6,
     height = 0.6,
     check_outdated_packages_on_open = false,
     icons = {
-      package_installed = "✓",
-      package_pending = "➜",
-      package_uninstalled = "✗"
+      package_installed = '✓',
+      package_pending = '➜',
+      package_uninstalled = '✗'
     },
   },
 })
@@ -176,26 +176,26 @@ require("mason").setup({
 -- LSP Setup
 local lspconfig = require('lspconfig')
 local lsp_capabilities = require('cmp_nvim_lsp').default_capabilities()
-require("mason-lspconfig").setup({
+require('mason-lspconfig').setup({
   ensure_installed = {
-    "tsserver",
-    "gopls@v0.14.2", -- latest version with suport for go 1.18
-    "bashls",
-    "sqlls",
-    "lua_ls",
+    'tsserver',
+    'gopls@v0.14.2', -- latest version with suport for go 1.18
+    'bashls',
+    'sqlls',
+    'lua_ls',
   },
   automatic_installation = true,
   handlers = {
     function(server_name) -- default handler
       lspconfig[server_name].setup({ capabilities = lsp_capabilities })
     end,
-    ["lua_ls"] = function() -- override lua handler
+    ['lua_ls'] = function() -- override lua handler
       lspconfig.lua_ls.setup({
         settings = {
           capabilities = lsp_capabilities,
           Lua = {
             diagnostics = {
-              globals = { "vim" }
+              globals = { 'vim' }
             }
           }
         }
@@ -283,11 +283,11 @@ cmp.setup({
     ['<CR>'] = cmp.mapping.confirm({ select = true }),
     ['<C-CR>'] = cmp.mapping.abort(),
 
-    ["<Tab>"] = cmp.mapping(function(fallback)
+    ['<Tab>'] = cmp.mapping(function(fallback)
       local has_words_before = function()
         unpack = unpack or table.unpack
         local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-        return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+        return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match('%s') == nil
       end
 
       if cmp.visible() then
@@ -299,9 +299,9 @@ cmp.setup({
       else
         fallback()
       end
-    end, { "i", "s" }),
+    end, { 'i', 's' }),
 
-    ["<S-Tab>"] = cmp.mapping(function(fallback)
+    ['<S-Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_prev_item()
       elseif snippy.can_jump(-1) then
@@ -309,7 +309,7 @@ cmp.setup({
       else
         fallback()
       end
-    end, { "i", "s" }),
+    end, { 'i', 's' }),
   },
   experimental = {
     ghost_text = true,
