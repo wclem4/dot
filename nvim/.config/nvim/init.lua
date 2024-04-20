@@ -145,7 +145,16 @@ require('nvim-treesitter.configs').setup {
 require('fidget').setup()
 
 -- Search Setup
-require('telescope').setup()
+local actions = require('telescope.actions')
+require('telescope').setup({
+  defaults = {
+    mappings = {
+      i = {
+        ["<esc>"] = actions.close,
+      },
+    },
+  },
+})
 local tsb = require('telescope.builtin')
 vim.keymap.set('n', '<leader>gf', tsb.git_files, { desc = 'Search [G]it [F]iles' })
 vim.keymap.set('n', '<leader>sf', tsb.find_files, { desc = '[S]earch [F]iles' })
