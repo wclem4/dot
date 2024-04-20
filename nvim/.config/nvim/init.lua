@@ -20,7 +20,7 @@ vim.api.nvim_create_autocmd('BufReadPost', {
   end
 })
 
--- Copy/Paste between windows
+-- Copy/Paste between vim sessions
 vim.keymap.set('v', '<leader>y', ':w! /tmp/vitmp<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<leader>p', ':r! cat /tmp/vitmp<CR>', { noremap = true, silent = true })
 
@@ -91,7 +91,7 @@ require("lazy").setup({
   'hrsh7th/cmp-buffer',
   'hrsh7th/cmp-nvim-lsp',
   'dcampos/nvim-snippy',
-  'dcampos/cmp-snippy'
+  'dcampos/cmp-snippy',
 })
 
 -- Status Line Setup
@@ -137,7 +137,6 @@ require("nvim-treesitter.configs").setup {
   },
   highlight = {
     enable = true,
-    additional_vim_regex_highlighting = false
   },
 }
 
@@ -181,12 +180,7 @@ lspconfig.bashls.setup({ capabilities = lsp_capabilities })
 lspconfig.jsonls.setup({ capabilities = lsp_capabilities })
 lspconfig.gopls.setup({ capabilities = lsp_capabilities })
 lspconfig.sqlls.setup({ capabilities = lsp_capabilities })
-lspconfig.tsserver.setup({
-  capabilities = lsp_capabilities,
-  init_options = {
-    preferences = { includeCompletionsForModuleExports = false }
-  }
-})
+lspconfig.tsserver.setup({ capabilities = lsp_capabilities })
 lspconfig.lua_ls.setup({
   capabilities = lsp_capabilities,
   settings = {
