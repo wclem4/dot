@@ -92,6 +92,7 @@ require("lazy").setup({
   'hrsh7th/cmp-buffer',
   'dcampos/nvim-snippy',
   'dcampos/cmp-snippy',
+  'honza/vim-snippets',
 })
 
 -- Status Line Setup
@@ -242,18 +243,22 @@ vim.diagnostic.config({
 
 -- Completion Setup
 vim.opt.completeopt = { 'menu', 'menuone' }
+
 local cmp = require('cmp')
+local snippy = require('snippy');
+
 local select_opts = { behavior = cmp.SelectBehavior.Select }
 cmp.setup({
   snippet = {
     expand = function(args)
-      require('snippy').expand_snippet(args.body)
+      snippy.expand_snippet(args.body)
     end,
   },
   sources = {
     { name = 'path' },
     { name = 'buffer',  keyword_length = 2 },
     { name = 'nvim_lsp' },
+    { name = 'snippy' },
   },
   formatting = {
     fields = { 'menu', 'abbr', 'kind' },
@@ -262,43 +267,49 @@ cmp.setup({
         nvim_lsp = 'LSP',
         buffer = 'Buffer',
         path = 'Path',
+        snippy = 'Snip',
       }
       item.menu = menu_icon[entry.source.name]
       return item
     end,
   },
   mapping = {
-    ['<Up>'] = cmp.mapping.select_prev_item(select_opts),
-    ['<Down>'] = cmp.mapping.select_next_item(select_opts),
-
     ['<C-p>'] = cmp.mapping.select_prev_item(select_opts),
     ['<C-n>'] = cmp.mapping.select_next_item(select_opts),
 
     ['<C-u>'] = cmp.mapping.scroll_docs(-4),
     ['<C-d>'] = cmp.mapping.scroll_docs(4),
 
-    ['<C-e>'] = cmp.mapping.abort(),
     ['<CR>'] = cmp.mapping.confirm({ select = true }),
+    ['<C-CR>'] = cmp.mapping.abort(),
 
-    ['<Tab>'] = cmp.mapping(function(fallback)
-      local col = vim.fn.col('.') - 1
+    ["<Tab>"] = cmp.mapping(function(fallback)
+      local has_words_before = function()
+        unpack = unpack or table.unpack
+        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+        return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+      end
 
       if cmp.visible() then
-        cmp.select_next_item(select_opts)
-      elseif col == 0 or vim.fn.getline('.'):sub(col, col):match('%s') then
-        fallback()
-      else
+        cmp.select_next_item()
+      elseif snippy.can_expand_or_advance() then
+        snippy.expand_or_advance()
+      elseif has_words_before() then
         cmp.complete()
-      end
-    end, { 'i', 's' }),
-
-    ['<S-Tab>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_prev_item(select_opts)
       else
         fallback()
       end
-    end, { 'i', 's' }),
+    end, { "i", "s" }),
+
+    ["<S-Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      elseif snippy.can_jump(-1) then
+        snippy.previous()
+      else
+        fallback()
+      end
+    end, { "i", "s" }),
   },
   experimental = {
     ghost_text = true,
