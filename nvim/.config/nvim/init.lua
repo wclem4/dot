@@ -80,16 +80,16 @@ require("lazy").setup({
 
   -- Package Manager
   'williamboman/mason.nvim',
-  'williamboman/mason-lspconfig.nvim',
 
   -- LSP
   'neovim/nvim-lspconfig',
+  'williamboman/mason-lspconfig.nvim',
+  'hrsh7th/cmp-nvim-lsp',
 
   -- Completion
   'hrsh7th/nvim-cmp',
   'hrsh7th/cmp-path',
   'hrsh7th/cmp-buffer',
-  'hrsh7th/cmp-nvim-lsp',
   'dcampos/nvim-snippy',
   'dcampos/cmp-snippy',
 })
@@ -159,39 +159,49 @@ vim.keymap.set('n', '<leader>ss', tsb.builtin, { desc = '[S]earch [S]elect Teles
 require('which-key').setup()
 
 -- Package Manager Setup
-require("mason").setup()
-require("mason-lspconfig").setup({
-  ensure_installed = {
-    "bashls",
-    "jsonls",
-    "gopls",
-    "sqlls",
-    "tsserver",
-    "lua_ls",
-    "eslint",
+require("mason").setup({
+  ui = {
+    width = 0.6,
+    height = 0.6,
+    check_outdated_packages_on_open = false,
+    icons = {
+      package_installed = "✓",
+      package_pending = "➜",
+      package_uninstalled = "✗"
+    },
   },
-  automatic_installation = true,
 })
 
 -- LSP Setup
 local lspconfig = require('lspconfig')
 local lsp_capabilities = require('cmp_nvim_lsp').default_capabilities()
-lspconfig.bashls.setup({ capabilities = lsp_capabilities })
-lspconfig.jsonls.setup({ capabilities = lsp_capabilities })
-lspconfig.gopls.setup({ capabilities = lsp_capabilities })
-lspconfig.sqlls.setup({ capabilities = lsp_capabilities })
-lspconfig.tsserver.setup({ capabilities = lsp_capabilities })
-lspconfig.lua_ls.setup({
-  capabilities = lsp_capabilities,
-  settings = {
-    Lua = {
-      diagnostics = {
-        globals = { 'vim' },
-      },
-    }
+require("mason-lspconfig").setup({
+  ensure_installed = {
+    "tsserver",
+    "gopls@v0.14.2", -- latest version with suport for go 1.18
+    "bashls",
+    "sqlls",
+    "lua_ls",
+  },
+  automatic_installation = true,
+  handlers = {
+    function(server_name) -- default handler
+      lspconfig[server_name].setup({ capabilities = lsp_capabilities })
+    end,
+    ["lua_ls"] = function() -- override lua handler
+      lspconfig.lua_ls.setup({
+        settings = {
+          capabilities = lsp_capabilities,
+          Lua = {
+            diagnostics = {
+              globals = { "vim" }
+            }
+          }
+        }
+      })
+    end,
   },
 })
-lspconfig.eslint.setup({ capabilities = lsp_capabilities })
 
 vim.api.nvim_create_autocmd('LspAttach', {
   desc = 'LSP actions',
@@ -217,7 +227,6 @@ local sign = function(opts)
     numhl = ''
   })
 end
-
 sign({ name = 'DiagnosticSignError', text = '✘' })
 sign({ name = 'DiagnosticSignWarn', text = '▲' })
 sign({ name = 'DiagnosticSignHint', text = '⚑' })
@@ -291,4 +300,7 @@ cmp.setup({
       end
     end, { 'i', 's' }),
   },
+  experimental = {
+    ghost_text = true,
+  }
 })
