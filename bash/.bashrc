@@ -5,17 +5,16 @@
 alias ls='ls -l --color=auto'
 alias vim='nvim'
 alias feh='feh -Z'
-# alias vpn='sudo openvpn --config /home/walker/vpn/profile-526.ovpn --auth-user-pass /home/walker/vpn/vpncreds'
-alias showpath="tr ':' '\n' <<< "$PATH""
 alias bc='bc -q'
 alias sudo='sudo '
+alias showpath="tr ':' '\n' <<< "$PATH""
 
 GOPATH=~/go
-PATH=~/.local/bin:$PATH
 PATH=$GOPATH/bin:$PATH
+
+PATH=~/.local/bin:$PATH
 PATH=~/.nvm/versions/node/v14.10.1/bin/node:$PATH
 PATH=~/.bin:$PATH
-PATH=~/.local/share/gem/ruby/3.0.0/bin:$PATH
 
 GEM_HOME=~/.gem
 HISTSIZE=20000
@@ -32,7 +31,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
-# start ssh agent
+# Start SSH Agent
 if ! pgrep -u "$USER" ssh-agent > /dev/null; then
     ssh-agent -t 1h > "$XDG_RUNTIME_DIR/ssh-agent.env"
 fi
@@ -40,5 +39,5 @@ if [[ ! "$SSH_AUTH_SOCK" ]]; then
     source "$XDG_RUNTIME_DIR/ssh-agent.env" >/dev/null
 fi
 
-#direnv setup
+# direnv setup
 eval "$(direnv hook bash)"
