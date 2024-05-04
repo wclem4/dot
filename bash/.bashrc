@@ -20,7 +20,8 @@ GEM_HOME=~/.gem
 HISTSIZE=20000
 
 # bash prompt
-PS1='\[\e[41m\]\[\e[1;37m\] \u \[\e[47m\]\[\e[1;30m\] \w \[\e[0m\]\[\e[1;37m\]\[\e[41m\] > \[\e[0m\] '
+# PS1='\[\e[41m\]\[\e[37m\] \u \[\e[47m\]\[\e[1;30m\] \w \[\e[0m\]\[\e[37m\]\[\e[41m\] > \[\e[0m\] ' # red
+PS1='\[\e[44m\]\[\e[37;97m\] \u \[\e[47m\]\[\e[1;30m\] \w \[\e[0m\]\[\e[37;97m\]\[\e[44m\] > \[\e[0m\] ' # blue
 
 # bash completion
 [[ $PS1 && -f /usr/share/bash-completion/bash_completion ]] && \

@@ -16,7 +16,7 @@ secondary = #787878
 alert = #bd2c40
 
 [bar/top]
-monitor = ${env:MONITOR:DP-3}
+monitor = ${env:MONITOR:DP-2}
 width = 100%
 height = 24
 fixed-center = true
@@ -32,11 +32,10 @@ module-margin-left = 0
 module-margin-right = 0
 font-0 = Hack:size=10;2
 font-1 = Noto Color Emoji:style=Regular:scale=12;2
+font-2 = "Material\-Design\-Iconic\-Font:style=Design-Iconic-Font;2"
 modules-left = i3
 modules-center = date
-modules-right = pulseaudio memory cpu temperature gpuutil gputemp gpu2util gpu2temp
-; gpumine gpuutil gputemp gpumh gpu2mine gpu2util gpu2temp gpu2mh
-; modules-right = audiodevice pulseaudio memory cpu temperature gpumine gpuutil gputemp gpumh gpu2mine gpu2util gpu2temp gpu2mh
+modules-right = pulseaudio memory cpu temperature gpuutil gputemp ping
 cursor-click = pointer
 cursor-scroll = ns-resize
 
@@ -73,18 +72,6 @@ interval = 1
 date = "%Y/%m/%d"
 time = %H:%M:%S
 label = %date% %time%
-
-[module/audiodevice]
-type = custom/script
-exec = audioswitch
-interval = 1
-click-left = audioswitch toggle
-format = <label>
-format-padding = 1
-format-background = ${colors.background}
-format-foreground = ${colors.foreground}
-label = %output%
-label-font = 1
 
 [module/pulseaudio]
 type = internal/pulseaudio
@@ -127,18 +114,6 @@ format-padding = 1
 format = <label>
 label = %temperature-c%
 
-[module/gpumine]
-type = custom/script
-exec = minerutil miner0
-interval = 1
-click-left = minerutil miner0 toggle
-format = <label>
-format-padding = 1
-format-background = ${colors.background}
-format-foreground = ${colors.foreground}
-label = %output%
-label-font = 1
-
 [module/gpuutil]
 type = custom/script
 interval = 1
@@ -153,56 +128,13 @@ format = <label>
 label = %output%
 exec = nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits | awk 'NR==1{print $1 "°C "}'
 
-[module/gpumh]
+[module/ping]
 type = custom/script
-interval = 1
-format = <label>
-label = %output%
-label-padding-right = 1
-exec = minerstats miner0
-exec-if = minerstats miner0
-
-[module/gpu2mine]
-type = custom/script
-exec = minerutil miner1
-interval = 1
-click-left = minerutil miner1 toggle
-format = <label>
-format-padding = 1
-format-background = ${colors.background}
-format-foreground = ${colors.foreground}
-label = %output%
-label-font = 1
-
-[module/gpu2util]
-type = custom/script
-interval = 1
-format = <label>
-label = [GPU2] %output%
-exec = nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits | awk 'NR==2{print $1 "% "}'
-
-[module/gpu2temp]
-type = custom/script
-interval = 1
-format = <label>
-label = %output%
-exec = nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits | awk 'NR==2{print $1 "°C "}'
-
-[module/gpu2mh]
-type = custom/script
-interval = 1
-format = <label>
-label = %output%
-label-padding-right = 1
-exec = minerstats miner1
-exec-if = minerstats miner1
-
-[module/wattage]
-type = custom/script
-exec = ~/.bin/ups_wattage.sh
-label = " %output%W"
-interval = 15
-format-padding = 1
+exec = ping_polybar
+interval = 2
+format = [PING] <label>
+format-padding = 0
+label = "%output% " 
 
 [settings]
 screenchange-reload = true

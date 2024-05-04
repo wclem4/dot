@@ -42,7 +42,7 @@ bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOU
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec alacritty
+bindsym $mod+Return exec --no-startup-id alacritty
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -61,6 +61,7 @@ exec --no-startup-id dunst -config /home/walker/.config/dunst/dunstrc
 # installed.
 # bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 bindsym $mod+d exec rofi -show drun
+bindsym $mod+c exec rofi -show ssh
 
 # change focus
 # bindsym $mod+j focus left
@@ -162,7 +163,14 @@ bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
+# bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
+# Exit menu
+bindsym $mod+Shift+e exec i3-nagbar -f "pango:Hack 10" -t warning \
+-m "Exit i3? This will end your current X session." \
+-B "Exit now" "i3-msg exit" \
+-B "Sleep" "systemctl suspend && pkill i3-nagbar" \
+-B "Reboot" "systemctl reboot" \
+-B "Shut Down" "systemctl poweroff" \
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
