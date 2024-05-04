@@ -167,10 +167,11 @@ bindsym $mod+Shift+r restart
 # Exit menu
 bindsym $mod+Shift+e exec i3-nagbar -f "pango:Hack 10" -t warning \
 -m "Exit i3? This will end your current X session." \
--B "Exit now" "i3-msg exit" \
--B "Sleep" "systemctl suspend && pkill i3-nagbar" \
--B "Reboot" "systemctl reboot" \
--B "Shut Down" "systemctl poweroff" \
+-B "exit i3" "i3-msg exit" \
+-B "standby" "xset dpms force standby && exit" \
+-B "sleep" "systemctl suspend && pkill i3-nagbar" \
+-B "reboot" "systemctl reboot" \
+-B "shutdown" "systemctl poweroff" \
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
