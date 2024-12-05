@@ -66,6 +66,15 @@ require('lazy').setup({
   -- Notifications
   'j-hui/fidget.nvim',
 
+  -- Rust dev
+  {
+    'rust-lang/rust.vim',
+    ft = 'rust',
+    init = function()
+      vim.g.rustfmt_autosave = 1
+    end
+  },
+
   -- Search
   {
     'nvim-telescope/telescope.nvim',
@@ -93,6 +102,49 @@ require('lazy').setup({
   'dcampos/nvim-snippy',
   'dcampos/cmp-snippy',
   'honza/vim-snippets',
+
+  -- AI 
+  {
+    "olimorris/codecompanion.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+    },
+    config = true
+  },
+  {
+    "MeanderingProgrammer/render-markdown.nvim",
+    ft = {
+      "markdown",
+      "codecompanion"
+    }
+  },
+})
+
+require("codecompanion").setup({
+  adapters = {
+    openai = function()
+      return require("codecompanion.adapters").extend("openai", {
+        env = {
+          api_key = "cmd:echo $OPENAI_API_KEY",
+        },
+      })
+    end,
+  },
+  display = {
+    chat = {
+      render_headers = false,
+    }
+  },
+  strategies = {
+    chat = {
+      adapter = "openai",
+    },
+    inline = {
+      adapter = "openai",
+    },
+  },
+
 })
 
 -- Status Line Setup
@@ -111,12 +163,16 @@ require('lualine').setup {
 -- Formatter Setup
 require('conform').setup({
   formatters_by_ft = {
-    javascript = { 'prettier' },
-    typescript = { 'prettier' },
+    javascript = { "prettier", stop_after_first = true },
+    javascriptreact = { "prettier", stop_after_first = true },
+    typescript = { "prettier", stop_after_first = true },
+    typescriptreact = { "prettier", stop_after_first = true },
+    yaml = { "prettier", stop_after_first = true },
+    json = { "prettier", stop_after_first = true },
     go = { 'goimports', 'gofmt' }
   },
   format_on_save = {
-    lsp_fallback = true,
+    timeout_ms = 500,
   },
 })
 
@@ -135,6 +191,7 @@ require('nvim-treesitter.configs').setup {
     'vimdoc',
     'query',
     'c',
+    'rust',
   },
   highlight = {
     enable = true,
@@ -185,13 +242,14 @@ require('mason').setup({
 -- LSP Setup
 local lspconfig = require('lspconfig')
 local lsp_capabilities = require('cmp_nvim_lsp').default_capabilities()
+local lsp_util = require("lspconfig/util")
 require('mason-lspconfig').setup({
   ensure_installed = {
-    'tsserver',
-    'gopls@v0.14.2', -- latest version with suport for go 1.18
+    'rust_analyzer',
     'bashls',
     'sqlls',
     'lua_ls',
+    'ts_ls',
   },
   automatic_installation = true,
   handlers = {
@@ -207,6 +265,17 @@ require('mason-lspconfig').setup({
               globals = { 'vim' }
             }
           }
+        }
+      })
+    end,
+    ['rust_analyzer'] = function() -- override rust handler
+      lspconfig.rust_analyzer.setup({
+        root_dir = lsp_util.root_pattern("Cargo.toml"),
+        settings = {
+          capabilities = lsp_capabilities,
+          cargo = {
+            allFeatures = true,
+          },
         }
       })
     end,
