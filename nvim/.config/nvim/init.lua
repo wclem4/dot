@@ -169,7 +169,8 @@ require('conform').setup({
     typescriptreact = { "prettier", stop_after_first = true },
     yaml = { "prettier", stop_after_first = true },
     json = { "prettier", stop_after_first = true },
-    go = { 'goimports', 'gofmt' }
+    go = { 'goimports', 'gofmt' },
+    kotlin = { 'ktlint' }
   },
   format_on_save = {
     timeout_ms = 500,
@@ -192,6 +193,7 @@ require('nvim-treesitter.configs').setup {
     'query',
     'c',
     'rust',
+    'kotlin'
   },
   highlight = {
     enable = true,
@@ -250,6 +252,7 @@ require('mason-lspconfig').setup({
     'sqlls',
     'lua_ls',
     'ts_ls',
+    'kotlin_language_server'
   },
   automatic_installation = true,
   handlers = {
@@ -277,6 +280,13 @@ require('mason-lspconfig').setup({
             allFeatures = true,
           },
         }
+      })
+    end,
+    ['kotlin_language_server'] = function() -- override rust handler
+      lspconfig.kotlin_language_server.setup({
+        cmd = { "kotlin-language-server" },
+        root_dir = lspconfig.util.root_pattern(".git"),
+        capabilities = lsp_capabilities,
       })
     end,
   },
