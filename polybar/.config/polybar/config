@@ -1,11 +1,3 @@
-;   ██████╗  ██████╗ ██╗  ██╗   ██╗██████╗  █████╗ ██████╗
-;   ██╔══██╗██╔═══██╗██║  ╚██╗ ██╔╝██╔══██╗██╔══██╗██╔══██╗
-;   ██████╔╝██║   ██║██║   ╚████╔╝ ██████╔╝███████║██████╔╝
-;   ██╔═══╝ ██║   ██║██║    ╚██╔╝  ██╔══██╗██╔══██║██╔══██╗
-;   ██║     ╚██████╔╝███████╗██║   ██████╔╝██║  ██║██║  ██║
-;   ╚═╝      ╚═════╝ ╚══════╝╚═╝   ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
-;           https://github.com/polybar/polybar
-
 [colors]
 background = #222
 background-alt = #444
@@ -15,8 +7,8 @@ primary = #ff4151
 secondary = #787878
 alert = #bd2c40
 
-[bar/top]
-monitor = ${env:MONITOR:DP-2}
+[bar/primary]
+monitor = ${env:MONITOR}
 width = 100%
 height = 24
 fixed-center = true
@@ -25,17 +17,41 @@ foreground = ${colors.foreground}
 line-size = 1
 line-color = ${colors.primary}
 padding-left = 0
-padding-right = 0
+padding-right = 1
 border-bottom-size = 1
 border-bottom-color = ${colors.foreground-alt}
-module-margin-left = 0
+module-margin-left = 1
 module-margin-right = 0
 font-0 = Hack:size=10;2
 font-1 = Noto Color Emoji:style=Regular:scale=12;2
 font-2 = "Material\-Design\-Iconic\-Font:style=Design-Iconic-Font;2"
 modules-left = i3
 modules-center = date
-modules-right = pulseaudio memory cpu temperature gpuutil gputemp ping
+modules-right = pulseaudio ping-label ping-val mb-label mb-temp cpu-label cpu-percent cpu-temp gpu-label gpu-percent gpu-temp mem-label mem-percent mem-temp
+cursor-click = pointer
+cursor-scroll = ns-resize
+
+[bar/secondary]
+monitor = ${env:MONITOR}
+width = 100%
+height = 24
+fixed-center = true
+background = ${colors.background}
+foreground = ${colors.foreground}
+line-size = 1
+line-color = ${colors.primary}
+padding-left = 0
+padding-right = 1
+border-bottom-size = 1
+border-bottom-color = ${colors.foreground-alt}
+module-margin-left = 1
+module-margin-right = 0
+font-0 = Hack:size=10;2
+font-1 = Noto Color Emoji:style=Regular:scale=12;2
+font-2 = "Material\-Design\-Iconic\-Font:style=Design-Iconic-Font;2"
+modules-left = i3
+modules-center = date
+modules-right= pulseaudio ping-label ping-val
 cursor-click = pointer
 cursor-scroll = ns-resize
 
@@ -93,48 +109,80 @@ bar-volume-empty-font = 2
 bar-volume-empty-foreground = ${colors.foreground-alt}
 use-ui-max = false
 
-[module/memory]
-type = internal/memory
-interval = 1
-format-padding = 2
-format = <label>
-label = [MEM] %percentage_used%%
+[module/ping-label]
+type = custom/text 
+label = [PING]
 
-[module/cpu]
+[module/ping-val]
+type = custom/script
+interval = 2
+format = <label>
+label = "%output%" 
+exec = ping_polybar
+
+[module/cpu-label]
+type = custom/text 
+label = [CPU]
+
+[module/cpu-percent]
 type = internal/cpu
 interval = 1
-format-padding = 0
 format = <label>
-label = [CPU] %percentage:0%%
+label = %percentage:0%%
 
-[module/temperature]
-type = internal/temperature
-interval = 1
-format-padding = 1
-format = <label>
-label = %temperature-c%
-
-[module/gpuutil]
-type = custom/script
-interval = 1
-format = <label>
-label = [GPU1] %output%
-exec = nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits | awk 'NR==1{print $1 "% "}'
-
-[module/gputemp]
+[module/cpu-temp]
 type = custom/script
 interval = 1
 format = <label>
 label = %output%
-exec = nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits | awk 'NR==1{print $1 "°C "}'
+exec = sensors -j | jq -r 'to_entries[] | select(.key | startswith("k10temp")) | .value["Tctl"]["temp1_input"] | floor | "\(.)°C"' | paste -sd ' '
 
-[module/ping]
+[module/mb-label]
+type = custom/text 
+label = [MB]
+
+[module/mb-temp]
+type = internal/temperature
+interval = 1
+format = <label>
+label = %temperature-c%
+
+[module/gpu-label]
+type = custom/text 
+label = [GPU]
+
+[module/gpu-percent]
 type = custom/script
-exec = ping_polybar
-interval = 2
-format = [PING] <label>
-format-padding = 0
-label = "%output% " 
+interval = 1
+format = <label>
+label = %output%
+; exec = nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits | awk 'NR==1{print $1 "% "}'
+exec = cat /sys/class/drm/card*/device/gpu_busy_percent | awk '{print $1 "%"}'
+
+[module/gpu-temp]
+type = custom/script
+interval = 1
+format = <label>
+label = %output%
+; exec = nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits | awk 'NR==1{print $1 "°C "}'
+exec = cat /sys/class/drm/card*/device/hwmon/hwmon*/temp1_input | rev | cut -c 4- | rev | awk '{print $1 "°C"}'
+
+[module/mem-label]
+type = custom/text 
+label = [MEM]
+
+[module/mem-percent]
+type = internal/memory
+interval = 1
+format = <label>
+label = %percentage_used%%
+
+[module/mem-temp]
+type = custom/script
+interval = 1
+format = <label>
+label = %output%
+exec = sensors -j | jq -r 'to_entries[] | select(.key | startswith("jc42-i2c")) | .value["temp1"]["temp1_input"] | floor | "\(.)°C"' | paste -sd ' '
 
 [settings]
 screenchange-reload = true
