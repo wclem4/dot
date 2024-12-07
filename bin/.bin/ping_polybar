@@ -6,5 +6,5 @@ if [ $? -eq 0 ]
 then 
     echo "$PING" | awk -F'/' 'END {printf "%.1fms", $5}'
 else 
-    echo " "
+    echo ""
 fi
