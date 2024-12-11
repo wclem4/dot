@@ -1,7 +1,7 @@
 [core]
-	editor = nvim
+    editor = nvim
 [user]
-	name = Walker Clem
+    name = Walker Clem
     email = walkerclem2@gmail.com
 [url "ssh://git@github.com/"]
     insteadOf = https://github.com/
