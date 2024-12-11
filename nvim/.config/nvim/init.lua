@@ -170,7 +170,8 @@ require('conform').setup({
     yaml = { "prettier", stop_after_first = true },
     json = { "prettier", stop_after_first = true },
     go = { 'goimports', 'gofmt' },
-    kotlin = { 'ktlint' }
+    kotlin = { 'ktlint' },
+    ocaml = { 'ocamlformat' }
   },
   format_on_save = {
     timeout_ms = 500,
@@ -252,7 +253,8 @@ require('mason-lspconfig').setup({
     'sqlls',
     'lua_ls',
     'ts_ls',
-    'kotlin_language_server'
+    'kotlin_language_server',
+    'ocamllsp'
   },
   automatic_installation = true,
   handlers = {
