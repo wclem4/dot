@@ -43,3 +43,6 @@ fi
 
 # direnv setup
 eval "$(direnv hook bash)"
+
+# ocaml setup
+eval "$(opam env)"

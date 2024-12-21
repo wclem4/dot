@@ -4,9 +4,18 @@ All my dotfiles managed with [GNU stow](https://www.gnu.org/software/stow/manual
 
 Use `stow package_name` to activate a package's symlink. 
 
-- **Distro**: Arch Linux
-- **WM**: i3
-- **Notifications**: dunst
+- **OS**: Arch Linux
+- **Editor**: neovim
 - **Shell**: bash
 - **Terminal**: alacritty
-- **Editor**: neovim
+- **WM**: i3
+
+Create package list:
+```
+pacman -Qqe > pkglist.txt
+```
+
+Install from package list:
+```
+pacman -S --needed - < pkglist.txt
+```
