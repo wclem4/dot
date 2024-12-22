@@ -2,7 +2,7 @@
 [[ $- != *i* ]] && return
 
 # aliases
-alias ls='ls -l --color=auto'
+alias ls='ls -lh --color=auto'
 alias vim='nvim'
 alias feh='feh -Z'
 alias bc='bc -q'
