@@ -10,23 +10,26 @@ vim.o.signcolumn = 'yes' -- Always show sign column
 vim.o.ignorecase = true  -- Ignore case when searching
 vim.o.scrolloff = 1      -- Number of lines kept above/below cursor
 
+local map = vim.keymap.set
+local fn = vim.fn
+
 -- Reopen file at last position
 vim.api.nvim_create_autocmd('BufReadPost', {
   pattern = '*',
   callback = function()
-    if vim.fn.line("'\"") > 1 and vim.fn.line("'\"") <= vim.fn.line("$") then
+    if fn.line("'\"") > 1 and fn.line("'\"") <= fn.line("$") then
       vim.cmd([[normal! g`"]])
     end
   end
 })
 
 -- Copy/Paste between vim sessions
-vim.keymap.set('v', '<leader>y', ':w! /tmp/vitmp<CR>', { noremap = true, silent = true })
-vim.keymap.set('n', '<leader>p', ':r! cat /tmp/vitmp<CR>', { noremap = true, silent = true })
+map('v', '<leader>y', ':w! /tmp/vitmp<CR>', { noremap = true, silent = true })
+map('n', '<leader>p', ':r! cat /tmp/vitmp<CR>', { noremap = true, silent = true })
 
-local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
+local lazypath = fn.stdpath('data') .. '/lazy/lazy.nvim'
 if not vim.loop.fs_stat(lazypath) then
-  vim.fn.system({
+  fn.system({
     'git',
     'clone',
     '--filter=blob:none',
@@ -119,6 +122,87 @@ require('lazy').setup({
       "codecompanion"
     }
   },
+  {
+    "scalameta/nvim-metals",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      {
+        "j-hui/fidget.nvim",
+        opts = {},
+      },
+    },
+    ft = { "scala", "sbt", "java" },
+    opts = function()
+      local metals_config = require("metals").bare_config()
+
+      metals_config.settings = {
+        showImplicitArguments = true,
+        excludedPackages = { "akka.actor.typed.javadsl", "com.github.swagger.akka.javadsl" },
+      }
+
+      metals_config.init_options.statusBarProvider = "on"
+
+      metals_config.capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+      metals_config.on_attach = function(client, bufnr)
+        require("metals").setup_dap()
+
+        -- LSP mappings
+        map("n", "gD", vim.lsp.buf.definition)
+        map("n", "K", vim.lsp.buf.hover)
+        map("n", "gi", vim.lsp.buf.implementation)
+        map("n", "gr", vim.lsp.buf.references)
+        map("n", "gds", vim.lsp.buf.document_symbol)
+        map("n", "gws", vim.lsp.buf.workspace_symbol)
+        map("n", "<leader>cl", vim.lsp.codelens.run)
+        map("n", "<leader>sh", vim.lsp.buf.signature_help)
+        map("n", "<leader>rn", vim.lsp.buf.rename)
+        map("n", "<leader>f", vim.lsp.buf.format)
+        map("n", "<leader>ca", vim.lsp.buf.code_action)
+
+        map("n", "<leader>ws", function()
+          require("metals").hover_worksheet()
+        end)
+
+        -- all workspace diagnostics
+        map("n", "<leader>aa", vim.diagnostic.setqflist)
+
+        -- all workspace errors
+        map("n", "<leader>ae", function()
+          vim.diagnostic.setqflist({ severity = "E" })
+        end)
+
+        -- all workspace warnings
+        map("n", "<leader>aw", function()
+          vim.diagnostic.setqflist({ severity = "W" })
+        end)
+
+        -- buffer diagnostics only
+        map("n", "<leader>d", vim.diagnostic.setloclist)
+
+        map("n", "[c", function()
+          vim.diagnostic.goto_prev({ wrap = false })
+        end)
+
+        map("n", "]c", function()
+          vim.diagnostic.goto_next({ wrap = false })
+        end)
+      end
+
+      return metals_config
+    end,
+    config = function(self, metals_config)
+      local nvim_metals_group = vim.api.nvim_create_augroup("nvim-metals", { clear = true })
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = self.ft,
+        callback = function()
+          require("metals").initialize_or_attach(metals_config)
+        end,
+        group = nvim_metals_group,
+      })
+    end
+
+  }
 })
 
 require("codecompanion").setup({
@@ -216,14 +300,14 @@ require('telescope').setup({
   },
 })
 local tsb = require('telescope.builtin')
-vim.keymap.set('n', '<leader>gf', tsb.git_files, { desc = 'Search [G]it [F]iles' })
-vim.keymap.set('n', '<leader>sf', tsb.find_files, { desc = '[S]earch [F]iles' })
-vim.keymap.set('n', '<leader>sg', tsb.live_grep, { desc = '[S]earch by [G]rep' })
-vim.keymap.set('n', '<leader>sw', tsb.grep_string, { desc = '[S]earch current [W]ord' })
-vim.keymap.set('n', '<leader>sd', tsb.diagnostics, { desc = '[S]earch [D]iagnostics' })
-vim.keymap.set('n', '<leader>sr', tsb.resume, { desc = '[S]earch [R]esume' })
-vim.keymap.set('n', '<leader>sh', tsb.help_tags, { desc = '[S]earch [H]elp' })
-vim.keymap.set('n', '<leader>ss', tsb.builtin, { desc = '[S]earch [S]elect Telescope' })
+map('n', '<leader>gf', tsb.git_files, { desc = 'Search [G]it [F]iles' })
+map('n', '<leader>sf', tsb.find_files, { desc = '[S]earch [F]iles' })
+map('n', '<leader>sg', tsb.live_grep, { desc = '[S]earch by [G]rep' })
+map('n', '<leader>sw', tsb.grep_string, { desc = '[S]earch current [W]ord' })
+map('n', '<leader>sd', tsb.diagnostics, { desc = '[S]earch [D]iagnostics' })
+map('n', '<leader>sr', tsb.resume, { desc = '[S]earch [R]esume' })
+map('n', '<leader>sh', tsb.help_tags, { desc = '[S]earch [H]elp' })
+map('n', '<leader>ss', tsb.builtin, { desc = '[S]earch [S]elect Telescope' })
 
 -- Key Dictionary Setup
 require('which-key').setup()
@@ -298,21 +382,21 @@ vim.api.nvim_create_autocmd('LspAttach', {
   desc = 'LSP actions',
   callback = function()
     local opts = { buffer = true }
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-    vim.keymap.set('n', 'go', vim.lsp.buf.type_definition, opts)
-    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-    vim.keymap.set('n', 'gs', vim.lsp.buf.signature_help, opts)
-    vim.keymap.set('n', 'gl', vim.diagnostic.open_float, opts)
-    vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
-    vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
+    map('n', 'K', vim.lsp.buf.hover, opts)
+    map('n', 'gd', vim.lsp.buf.definition, opts)
+    map('n', 'gD', vim.lsp.buf.declaration, opts)
+    map('n', 'gi', vim.lsp.buf.implementation, opts)
+    map('n', 'go', vim.lsp.buf.type_definition, opts)
+    map('n', 'gr', vim.lsp.buf.references, opts)
+    map('n', 'gs', vim.lsp.buf.signature_help, opts)
+    map('n', 'gl', vim.diagnostic.open_float, opts)
+    map('n', '[d', vim.diagnostic.goto_prev, opts)
+    map('n', ']d', vim.diagnostic.goto_next, opts)
   end
 })
 
 local sign = function(opts)
-  vim.fn.sign_define(opts.name, {
+  fn.sign_define(opts.name, {
     texthl = opts.name,
     text = opts.text,
     numhl = ''
