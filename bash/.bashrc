@@ -9,6 +9,7 @@ alias bc='bc -q'
 alias sudo='sudo '
 alias showpath="tr ':' '\n' <<< "$PATH""
 alias amdgpu_top="amdgpu_top --dark"
+alias x="startx"
 
 GOPATH=~/go
 PATH=$GOPATH/bin:$PATH

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+if [ $# -ne 2 ]; then
+  echo "Usage: split-num <total> <ratio_list>"
+  echo "Example: split-num 500 85/15"
+  exit 1
+fi
+
+TOTAL=$1
+RATIOS=$2
+
+IFS='/' read -ra PARTS <<< "$RATIOS"
+
+SUM=0
+for PART in "${PARTS[@]}"; do
+  SUM=$((SUM + PART))
+done
+
+for PART in "${PARTS[@]}"; do
+  PORTION=$(echo "scale=2; ($PART * $TOTAL) / $SUM" | bc)
+  
+  echo "Split for ${PART}%: ${PORTION}"
+done
+
